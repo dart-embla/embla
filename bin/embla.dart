@@ -1,3 +1,5 @@
+#!/usr/bin/env dart
+
 import 'dart:isolate';
 import 'dart:io';
 import 'dart:async';
