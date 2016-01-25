@@ -1,6 +1,8 @@
 name: embla
 description: A friendly web server transport layer for server side Dart apps
 version: 0.1.0
+author: Emil Persson <emil.n.persson@gmail.com>
+homepage: https://github.com/emilniklas/embla
 
 dependencies:
   container: ^0.1.2
