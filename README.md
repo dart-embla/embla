@@ -5,7 +5,7 @@ Embla is a powerful but simple server side application framework for Dart.
 ## Usage
 Install like so:
 
-```dart
+```yaml
 # pubspec.yaml
 dependencies:
   embla: any
