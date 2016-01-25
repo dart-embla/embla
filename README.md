@@ -2,6 +2,31 @@
 
 Embla is a powerful but simple server side application framework for Dart.
 
+## Usage
+Install like so:
+
+```dart
+# pubspec.yaml
+dependencies:
+  embla: any
+```
+
+```shell
+> pub get
+```
+
+Embla scripts can be run directly with `dart my_script.dart`, but for development we can use the Embla CLI:
+
+```shell
+> pub global activate embla
+# Add pub's binaries to PATH, to be able to omit "pub run" (Also: https://github.com/dart-lang/pub/issues/1204)
+> PATH=$PATH:~/.pub-cache/bin
+> embla start
+```
+
+Currently, `embla start` will look for a `bin/server.dart` file and start the app. If you make changes to
+your project files, the app will automatically restart.
+
 ## Overview
 Here's an example of a super simple Embla app.
 
@@ -128,4 +153,22 @@ Since controllers are middleware too, we can easily route our controllers to end
 
 ```dart
 Route.all('pages/*', PagesController)
+```
+
+## Custom Bootstrappers
+Bootstrappers hook into the initialization and deinitialization of the application. Creating one is
+super simple.
+
+```dart
+export 'package:embla/bootstrap.dart';
+import 'package:embla/application.dart';
+
+get embla => [new MyBootstrapper()];
+
+class MyBootstrapper extends Bootstrapper {
+  @Hook.init
+  init() {
+    print('Initializing the application!');
+  }
+}
 ```

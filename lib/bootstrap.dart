@@ -9,6 +9,7 @@ main(List<String> arguments, SendPort sendExitCommandPort) async {
 
   final processHandler = new ProcessHandler(
       init: () {
+        print('<gray><italic>Press Ctrl+C to exit</italic></gray>');
         return Application.boot(_findConfig());
       },
       deinit: (Application app) {

@@ -2,7 +2,11 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:async';
 
-main() async {
+main(List<String> arguments) async {
+  if (arguments.length < 1) return print('Usage: embla start');
+  final command = arguments[0];
+  if (command != 'start') return print('Usage: embla start (Only the run command available currently)');
+
   final filePath = '${Directory.current.path}/bin/server.dart';
   final fileUri = Uri.parse(filePath);
   bool willRestart = true;
