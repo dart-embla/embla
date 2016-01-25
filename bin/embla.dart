@@ -10,9 +10,8 @@ main(List<String> arguments) async {
   if (command != 'start') return print('Usage: embla start (Only the run command available currently)');
 
   final filePath = '${Directory.current.path}/bin/server.dart';
-  final fileUri = Uri.parse(filePath);
+  final fileUri = new Uri.file(filePath);
   bool willRestart = true;
-  int exitCode = 0;
   SendPort restartPort;
   StreamController changeBroadcast = new StreamController.broadcast();
 
@@ -59,5 +58,4 @@ main(List<String> arguments) async {
   }
 
   await watcher.cancel();
-//  exit(exitCode);
 }
