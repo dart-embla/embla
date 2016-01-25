@@ -2,11 +2,10 @@ name: embla
 description: A friendly web server transport layer for server side Dart apps
 version: 0.1.0
 
-executables:
-- embla
-
 dependencies:
-  cupid: ^0.9.10
+  container: ^0.1.2
+  stack_trace: ^1.6.0
+  shelf: ^0.6.4
 
 dev_dependencies:
   test: any
