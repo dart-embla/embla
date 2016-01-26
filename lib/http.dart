@@ -24,6 +24,19 @@ class Middleware {
     return handle;
   }
 
+  Request putLocals(Request request, Map<String, dynamic> locals) {
+    return request.change(
+        context: {
+          'embla:locals': locals
+        }
+    );
+  }
+
+  Map<String, dynamic> locals(Request request) {
+    return request.context['embla:locals'] as Map<String, dynamic>
+        ?? <String, dynamic>{};
+  }
+
   Future<Response> handle(Request request) async {
     return await _innerHandler(request);
   }
