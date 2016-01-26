@@ -210,7 +210,9 @@ class _Nothing {
   const _Nothing();
 }
 
-Pipeline pipe(
+typedef Pipeline PipelineFactory();
+
+PipelineFactory pipe(
     [middlewareA = _nothing, middlewareB = _nothing, middlewareC = _nothing,
     middlewareD = _nothing, middlewareE = _nothing, middlewareF = _nothing, middlewareG = _nothing,
     middlewareH = _nothing, middlewareI = _nothing, middlewareJ = _nothing, middlewareK = _nothing,
@@ -224,7 +226,7 @@ Pipeline pipe(
     middlewareO, middlewareP, middlewareQ, middlewareR, middlewareS, middlewareT,
     middlewareU, middlewareV, middlewareW, middlewareX, middlewareY, middlewareZ
   ].where((m) => m != _nothing);
-  return _pipe(_resolveMiddleware(middlewareTokens));
+  return () => _pipe(_resolveMiddleware(middlewareTokens));
 }
 
 Pipeline _pipe(Iterable<Middleware> middleware) {
@@ -262,7 +264,7 @@ Iterable<Middleware> _resolveMiddleware(Iterable tokens) sync* {
 class Route extends Middleware {
   final Iterable<String> methods;
   final String path;
-  final Pipeline pipeline;
+  final PipelineFactory pipeline;
   final RouteExpander _expander = new RouteExpander();
 
   Route._(this.methods, this.path, this.pipeline);
@@ -270,7 +272,7 @@ class Route extends Middleware {
   factory Route(
       Iterable<String> methods,
       String path,
-      Pipeline pipeline) =>
+      PipelineFactory pipeline) =>
       new Route._(
           methods.map((m) => m.toUpperCase()) as Iterable<String>,
           path.split('/').where((s) => s != '').join('/'),
@@ -278,6 +280,9 @@ class Route extends Middleware {
       );
 
   RegExp get regexPath => new RegExp(_expander.expand(path));
+
+  Pipeline __pipeline;
+  Pipeline get _pipeline => (__pipeline ??= pipeline()) as Pipeline;
 
   @override Future<Response> handle(Request request) async {
     if (!methods.contains(request.method)) {
@@ -287,7 +292,7 @@ class Route extends Middleware {
     final wildcards = _expander.parseWildcards(path, url);
     if (regexPath.hasMatch(url)) {
       try {
-        return await pipeline(request.change(
+        return await pipeline()(request.change(
             path: _expander.prefix(path, url),
             context: {
               'embla:wildcards': new Map.unmodifiable(
@@ -499,7 +504,7 @@ abstract class Controller extends Middleware {
 }
 
 class HttpBootstrapper extends Bootstrapper {
-  final Pipeline pipeline;
+  final PipelineFactory pipeline;
   final String host;
   final int port;
   final ResponseMaker _responseMaker = new ResponseMaker();
@@ -518,10 +523,11 @@ class HttpBootstrapper extends Bootstrapper {
 
   @Hook.interaction
   start(HttpServer server) {
+    final pipe = pipeline();
     server.listen((request) {
       shelf_io.handleRequest(request, (Request request) async {
         try {
-          return await pipeline(request);
+          return await pipe(request);
         } on NoResponseFromPipelineException {
           return new Response.notFound('Not Found');
         } on HttpException catch(e) {

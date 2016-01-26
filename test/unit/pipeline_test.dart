@@ -7,15 +7,15 @@ import 'dart:async';
 class PipelineTest extends UnitTest {
   Request request(String path, String method) => new Request(method, new Uri.http('localhost', path));
 
-  Future expectResponse(String method, String path, Pipeline pipeline, String body) async {
+  Future expectResponse(String method, String path, PipelineFactory pipeline, String body) async {
     expect(
-        await (await pipeline(request(path, method))).readAsString(),
+        await (await pipeline()(request(path, method))).readAsString(),
         await new Response.ok(body).readAsString()
     );
   }
 
-  Future expectThrows(String method, String path, Pipeline pipeline, Matcher matcher) async {
-    expect(pipe()(request(path, method)), throwsA(matcher));
+  Future expectThrows(String method, String path, PipelineFactory pipeline, Matcher matcher) async {
+    expect(pipeline()(request(path, method)), throwsA(matcher));
   }
 
   @test

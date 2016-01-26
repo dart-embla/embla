@@ -1,5 +1,7 @@
 import 'http.dart';
 import 'dart:async';
+import 'package:shelf_static/shelf_static.dart' as shelf_static;
+import 'package:shelf/shelf.dart' as shelf;
 
 class RemoveTrailingSlashMiddleware extends Middleware {
   @override Future<Response> handle(Request request) async {
@@ -65,5 +67,34 @@ class LoggerMiddleware extends Middleware {
         '<blue>${request.method}</blue> '
         '$url '
         '<$timeColor><italic>$timeInMilliseconds ms</italic></$timeColor>');
+  }
+}
+
+class StaticFilesMiddleware extends Middleware {
+  final String fileSystemPath;
+  final bool serveFilesOutsidePath;
+  final String defaultDocument;
+  final bool listDirectories;
+  final shelf.Handler handler;
+
+  StaticFilesMiddleware({
+      String fileSystemPath: 'web',
+      bool serveFilesOutsidePath: false,
+      String defaultDocument,
+      bool listDirectories: false
+      })
+      : fileSystemPath = fileSystemPath,
+        serveFilesOutsidePath = serveFilesOutsidePath,
+        defaultDocument = defaultDocument,
+        listDirectories = listDirectories,
+        handler = shelf_static.createStaticHandler(
+            fileSystemPath,
+            serveFilesOutsidePath: serveFilesOutsidePath,
+            defaultDocument: defaultDocument,
+            listDirectories: listDirectories
+        );
+
+  @override Future<Response> handle(Request request) async {
+    return await handler(request);
   }
 }
