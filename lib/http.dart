@@ -12,6 +12,7 @@ import 'dart:io' hide HttpException;
 import 'src/http/route_expander.dart';
 import 'src/http/response_maker.dart';
 import 'src/http/http_exceptions.dart';
+import 'src/util/trace_formatting.dart';
 export 'src/http/http_exceptions.dart';
 
 class Middleware {
@@ -33,6 +34,10 @@ class Middleware {
 
   Response redirect(String location) {
     return new Response.found(location);
+  }
+
+  Response redirectPermanently(String location) {
+    return new Response.movedPermanently(location);
   }
 
   abort([int statusCode = 500, body = 'Something went wrong']) {
@@ -224,7 +229,7 @@ Pipeline pipe(
 
 Pipeline _pipe(Iterable<Middleware> middleware) {
   final shelf.Pipeline pipe = middleware.fold /*<shelf.Pipeline>*/(
-      const shelf.Pipeline().addMiddleware(_noResponseToNotFound),
+      const shelf.Pipeline(),
       (shelf.Pipeline pipeline, Middleware middleware) {
     return pipeline.addMiddleware(middleware);
   }) as shelf.Pipeline;
@@ -233,16 +238,6 @@ Pipeline _pipe(Iterable<Middleware> middleware) {
   });
 
   return (Request request) async => handler(request);
-}
-
-shelf.Handler _noResponseToNotFound(shelf.Handler innerHandler) {
-  return (Request request) async {
-    try {
-      return await innerHandler(request);
-    } on NoResponseFromPipelineException {
-      throw new HttpNotFoundException();
-    }
-  };
 }
 
 class NoResponseFromPipelineException implements Exception {}
@@ -527,8 +522,13 @@ class HttpBootstrapper extends Bootstrapper {
       shelf_io.handleRequest(request, (Request request) async {
         try {
           return await pipeline(request);
+        } on NoResponseFromPipelineException {
+          return new Response.notFound('Not Found');
         } on HttpException catch(e) {
           return _responseMaker.parse(e.body).status(e.statusCode);
+        } catch(e, s) {
+          TraceFormatter.print(e, s);
+          return new Response.internalServerError(body: 'Internal Server Error');
         }
       });
     });

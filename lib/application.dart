@@ -18,17 +18,22 @@ class Application {
     return new Application._(
         container,
         new List.unmodifiable(
-            await Future.wait(
+            (await Future.wait(
                 bootstrappers
                     .map((b) => _timeline(container, b))
-            )
+            )).where((b) => b != null)
         )
     );
   }
 
   static Future _timeline(Container container, Bootstrapper bootstrapper) async {
-    await bootstrapper._run(container);
-    return bootstrapper;
+    try {
+      await bootstrapper._run(container);
+      return bootstrapper;
+    } catch (e, s) {
+      TraceFormatter.print(e, s);
+      return null;
+    }
   }
 
   Future exit() async {
@@ -83,17 +88,18 @@ abstract class Bootstrapper {
   }
 
   Future _exit() async {
-    await _callAnnotation(__methods, Hook.beforeExit);
-    await _callAnnotation(__methods, Hook.exit);
+    try {
+      await _callAnnotation(__methods, Hook.beforeExit);
+      await _callAnnotation(__methods, Hook.exit);
+    } catch (e, s) {
+      TraceFormatter.print(e, s);
+    }
   }
 
   Future _callAnnotation(Iterable<MethodMirror> methods, annotation) async {
     await Future.wait(
         _annotated(methods, annotation)
-            .map((c) => _runClosure(
-            c,
-            catchErrors: annotation == Hook.beforeExit || annotation == Hook.exit
-        ))
+            .map((c) => _runClosure(c))
     );
   }
 
@@ -106,14 +112,10 @@ abstract class Bootstrapper {
     return methods.where((m) => m.metadata.any((t) => t.reflectee == annotation));
   }
 
-  Future _runClosure(MethodMirror method, {bool catchErrors: false}) async {
+  Future _runClosure(MethodMirror method) async {
     ClosureMirror closure = _mirror.getField(method.simpleName) as ClosureMirror;
-    try {
-      await traceIdentifier_PJ9ZCKjkkKPFYjgH3jkW(() {
-        return _container.resolve(closure.reflectee);
-      });
-    } catch (e, s) {
-      TraceFormatter.print(e, s);
-    }
+    await traceIdentifier_PJ9ZCKjkkKPFYjgH3jkW(() {
+      return _container.resolve(closure.reflectee);
+    });
   }
 }
