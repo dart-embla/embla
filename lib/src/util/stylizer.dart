@@ -46,4 +46,12 @@ class Stylizer {
     }
     return input;
   }
+
+  String strip(String input) {
+    for (final tagName in _colors.keys) {
+      input = input.replaceAll('<$tagName>', '');
+      input = input.replaceAll('</$tagName>', '');
+    }
+    return input;
+  }
 }

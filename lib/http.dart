@@ -459,6 +459,40 @@ class Route extends Middleware {
   }
 }
 
+Middleware pipeIf(bool condition(Request request), [middlewareA = _nothing, middlewareB = _nothing, middlewareC = _nothing,
+middlewareD = _nothing, middlewareE = _nothing, middlewareF = _nothing, middlewareG = _nothing,
+middlewareH = _nothing, middlewareI = _nothing, middlewareJ = _nothing, middlewareK = _nothing,
+middlewareL = _nothing, middlewareM = _nothing, middlewareN = _nothing, middlewareO = _nothing,
+middlewareP = _nothing, middlewareQ = _nothing, middlewareR = _nothing, middlewareS = _nothing,
+middlewareT = _nothing, middlewareU = _nothing, middlewareV = _nothing, middlewareW = _nothing,
+middlewareX = _nothing, middlewareY = _nothing, middlewareZ = _nothing]) {
+  return new ConditionalMiddleware(condition, pipe(middlewareA, middlewareB,
+      middlewareC, middlewareD, middlewareE, middlewareF, middlewareG, middlewareH,
+      middlewareI, middlewareJ, middlewareK, middlewareL, middlewareM, middlewareN,
+      middlewareO, middlewareP, middlewareQ, middlewareR, middlewareS, middlewareT,
+      middlewareU, middlewareV, middlewareW, middlewareX, middlewareY, middlewareZ));
+}
+
+class ConditionalMiddleware extends Middleware {
+  final Function condition;
+  final Pipeline pipeline;
+
+  ConditionalMiddleware(this.condition, PipelineFactory pipeline)
+    : pipeline = pipeline();
+
+  @override Future<Response> handle(Request request) async {
+    try {
+      if (condition(request)) {
+        return await pipeline(request);
+      } else {
+        return await super.handle(request);
+      }
+    } on NoResponseFromPipelineException {
+      return await super.handle(request);
+    }
+  }
+}
+
 Middleware handler(Function handler) => new HandlerMiddleware(handler, helperContainer);
 
 class HandlerMiddleware extends Middleware {
