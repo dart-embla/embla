@@ -25,7 +25,7 @@ class PipelineTest extends UnitTest {
 
   @test
   itThrowsA404WithoutMiddleware() async {
-    await expectThrows('GET', '/', pipe(), new isInstanceOf<HttpNotFoundException>());
+    await expectThrows('GET', '/', pipe(), new isInstanceOf<NoResponseFromPipelineException>());
   }
 
   @test
@@ -47,10 +47,10 @@ class PipelineTest extends UnitTest {
     await expectResponse('GET', '/', pipeline, 'response');
 
     await expectThrows('GET', 'endpoint', pipeline,
-        new isInstanceOf<HttpNotFoundException>());
+        new isInstanceOf<NoResponseFromPipelineException>());
 
     await expectThrows('POST', '/', pipeline,
-        new isInstanceOf<HttpNotFoundException>());
+        new isInstanceOf<NoResponseFromPipelineException>());
   }
 
   @test

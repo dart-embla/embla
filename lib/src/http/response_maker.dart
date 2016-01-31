@@ -37,6 +37,10 @@ class ResponseMaker {
     }
 
     final mirror = reflect(anything);
+    if (mirror.type.instanceMembers.keys.contains(#toJson)) {
+      return _serialize(mirror.reflectee.toJson());
+    }
+
     final members = mirror.type.instanceMembers.values
         .where((m) => m.owner is! ClassMirror || (m.owner as ClassMirror).reflectedType != Object)
         .where((m) => m.isGetter)

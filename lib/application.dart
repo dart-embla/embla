@@ -19,8 +19,7 @@ class Application {
         container,
         new List.unmodifiable(
             (await Future.wait(
-                bootstrappers
-                    .map((b) => _timeline(container, b))
+                bootstrappers.map((b) => _timeline(container, b)) as Iterable<Future>
             )).where((b) => b != null)
         )
     );
@@ -37,7 +36,7 @@ class Application {
   }
 
   Future exit() async {
-    await Future.wait(bootstrappers.map((b) async => b._exit()));
+    await Future.wait(bootstrappers.map/*<Future>*/((b) async => b._exit()) as Iterable<Future>);
   }
 }
 
@@ -64,14 +63,18 @@ abstract class Hook {
 }
 
 abstract class Bootstrapper {
-  Container get container => _container;
+  Container get container => _container ?? (throw new Exception('To manually run hooks, first run $runtimeType#attach()'));
 
   InstanceMirror _mirror;
   Container _container;
   Iterable<MethodMirror> __methods;
 
+  void attach([Container container]) {
+    _container = container ?? new Container();
+  }
+
   Future _run(Container container) async {
-    _container = container;
+    attach(container);
     _mirror = reflect(this);
     __methods = _methods();
     await _callAnnotation(__methods, Hook.init);
@@ -99,7 +102,7 @@ abstract class Bootstrapper {
   Future _callAnnotation(Iterable<MethodMirror> methods, annotation) async {
     await Future.wait(
         _annotated(methods, annotation)
-            .map((c) => _runClosure(c))
+            .map/*<Future>*/((c) => _runClosure(c)) as Iterable<Future>
     );
   }
 
