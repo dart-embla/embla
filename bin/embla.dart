@@ -34,7 +34,8 @@ main(List<String> arguments) async {
         receiveExitCommandPort.sendPort,
         onExit: exitPort.sendPort,
         onError: errorPort.sendPort,
-        errorsAreFatal: false
+        errorsAreFatal: false,
+        automaticPackageResolution: true
     );
 
     restartPort = await receiveExitCommandPort.first
