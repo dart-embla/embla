@@ -53,7 +53,9 @@ class HttpBootstrapper extends Bootstrapper {
   @Hook.interaction
   start(HttpServer server) {
     final pipe = pipeline();
+    server.autoCompress = true;
     server.listen((request) {
+      request.response.bufferOutput = true;
       shelf_io.handleRequest(request, (_) => handleRequest(_, pipe));
     });
     print('<blue>Server started on <underline>http://${server.address.host}:${server.port}</underline></blue>');

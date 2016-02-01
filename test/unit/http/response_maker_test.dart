@@ -1,6 +1,7 @@
 import 'package:quark/unit.dart';
 import 'package:embla/src/http/response_maker.dart';
 import 'dart:io';
+import 'dart:async';
 export 'package:quark/init.dart';
 
 class ResponseMakerTest extends UnitTest {
@@ -50,6 +51,24 @@ class ResponseMakerTest extends UnitTest {
         {'nested': {'property': 'x'}},
         ContentType.JSON
     );
+  }
+
+  @test
+  itTurnsAStreamOfObjectsIntoJsonStream() async {
+    final r = responseMaker.parse(new Stream<Object>.fromIterable([new MyClass('x'), 2, 3]));
+
+    expect(r, new isInstanceOf<DataResponse>());
+    expect(r.contentType, ContentType.JSON);
+    expect(await r.jsonStream(r.body).toList(), ['[', '{"property":"x"}', ',', '2', ',', '3', ']']);
+  }
+
+  @test
+  itTurnsAStreamOfStringsIntoHtmlOutputStream() async {
+    final r = responseMaker.parse(new Stream<String>.fromIterable(['a', 'b', 'c']));
+
+    expect(r, new isInstanceOf<DataResponse>());
+    expect(r.contentType, ContentType.HTML);
+    expect(await r.body.toList(), ['a', 'b', 'c']);
   }
 }
 
