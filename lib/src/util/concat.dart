@@ -52,4 +52,3 @@ class _ConcatinatedIterator<E> implements Iterator<E> {
     return false;
   }
 }
-

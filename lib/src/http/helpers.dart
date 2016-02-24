@@ -27,4 +27,3 @@ shelf.Middleware applyLocals(Map<String, dynamic> locals) {
     };
   };
 }
-
