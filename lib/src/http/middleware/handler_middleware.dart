@@ -15,7 +15,10 @@ class HandlerMiddleware extends Middleware {
   @override Future<Response> handle(Request request) async {
     final Map<Type, Object> injections = request.context['embla:injections'] as Map<Type, Object>;
     final returnValue = await container.resolve(handler,
-        injecting: concatMaps/*<Map<Type, Object>>*/(injections ?? <Type, Object>{}, {Request: request}) as Map<Type, Object>,
+        injecting: concatMaps/*<Type, dynamic>*/(
+          (injections ?? {}) as Map<Type, dynamic>,
+          <Type, dynamic>{Request: request}
+        ),
         namedParameters: request.context['embla:wildcards'] as Map<String, String>
     );
 

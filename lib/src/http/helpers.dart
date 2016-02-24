@@ -9,7 +9,10 @@ shelf.Middleware applyInjections(Map<Type, Object> injections) {
     return (Request request) {
       return innerHandler(request.change(
           context: {
-            'embla:injections': concatMaps((request.context['embla:injections'] ?? {}) as Map<String, dynamic>, injections)
+            'embla:injections': concatMaps/*<Type, Object>*/(
+              (request.context['embla:injections'] ?? {}) as Map<Type, Object>,
+              injections
+            )
           }
       ));
     };
