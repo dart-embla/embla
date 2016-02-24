@@ -10,8 +10,18 @@ class LoggerMiddleware extends Middleware {
     duration() => beforeTime.difference(new DateTime.now());
     try {
       final response = await super.handle(request);
-      _log(request, response.statusCode, duration());
-      return response;
+      final controller = new StreamController<List<int>>();
+      var errored = false;
+      response.read().listen(controller.add, onDone: () {
+        controller.close();
+        if (errored) return;
+        _log(request, response.statusCode, duration());
+      }, onError: (e, s) {
+        _log(request, response.statusCode, duration(), failed: true);
+        errored = true;
+        controller.addError(e, s);
+      });
+      return response.change(body: controller.stream);
     } on NoResponseFromPipelineException {
       _log(request, 404, duration());
       rethrow;
@@ -24,7 +34,7 @@ class LoggerMiddleware extends Middleware {
     }
   }
 
-  void _log(Request request, int statusCode, Duration time) {
+  void _log(Request request, int statusCode, Duration time, {bool failed: false}) {
     final url = request.handlerPath + request.url.path;
     final statusColor = () {
       if (statusCode >= 200 && statusCode < 300) {
@@ -53,10 +63,13 @@ class LoggerMiddleware extends Middleware {
       return 'gray';
     }();
 
+    final suffix = failed ? '<red>THREW AFTER HEADERS WAS SENT</red>' : '';
+
     print('<gray><italic>${new DateTime.now()}</italic></gray> '
         '<$statusColor>$statusCode</$statusColor> '
         '<blue>${request.method}</blue> '
         '$url '
-        '<$timeColor><italic>$timeInMilliseconds ms</italic></$timeColor>');
+        '<$timeColor><italic>$timeInMilliseconds ms</italic></$timeColor> '
+        '$suffix');
   }
 }

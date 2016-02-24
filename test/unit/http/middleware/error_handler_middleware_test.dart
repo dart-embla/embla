@@ -48,6 +48,17 @@ class ErrorHandlerMiddlewareTest extends UnitTest {
         .on(SuperClass, () => null);
     }, throwsA(new isInstanceOf<BadErrorHandlerOrderException>()));
   }
+
+  @test
+  itCanCatchAll() async {
+    final middleware = ErrorHandlerMiddleware
+      .catchAll((error) => '$error');
+
+    final response = await middlewareCall(middleware, null, (r) => throw "message");
+
+    expect(await response.readAsString(), 'message');
+    expect(response.statusCode, 200);
+  }
 }
 
 abstract class SuperClass {}

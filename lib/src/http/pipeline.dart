@@ -27,12 +27,12 @@ PipelineFactory pipe(
   return () => pipeActual(resolveMiddleware(middlewareTokens));
 }
 
-Pipeline pipeActual(Iterable<Middleware> middleware) {
+Pipeline pipeActual(Iterable<shelf.Middleware> middleware) {
   final shelf.Pipeline pipe = middleware.fold/*<shelf.Pipeline>*/(
       const shelf.Pipeline(),
-      (shelf.Pipeline pipeline, Middleware middleware) {
+      (shelf.Pipeline pipeline, shelf.Middleware middleware) {
     return pipeline.addMiddleware(middleware);
-  }) as shelf.Pipeline;
+  });
   final shelf.Handler handler = pipe.addHandler((Request request) {
     throw new NoResponseFromPipelineException();
   });
