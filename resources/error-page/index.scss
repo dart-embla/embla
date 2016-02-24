@@ -1,0 +1,205 @@
+$font-standard: 'Roboto Slab', sans-serif;
+$font-monospace: 'Cousine', monospace;
+
+$color-white: #fefefe;
+$color-light: #f8f8f8;
+$color-gray: #555;
+$color-black: #333;
+$color-blue: #3385ff;
+$color-red: rgb(222, 69, 48);
+
+body {
+  background: $color-light;
+  margin: 0;
+  font-family: $font-standard;
+  color: $color-black;
+}
+.container {
+  background: $color-white;
+  display: flex;
+  flex-direction: column;
+  max-width: 80em;
+  margin: auto;
+  height: 100vh;
+  box-shadow: 0 -5em 6em -5em black;
+
+  &__header {
+    padding: 1rem;
+
+    &__code {
+      color: $color-gray;
+      font-size: 0.9em;
+      font-family: $font-monospace;
+    }
+    &__heading {
+      margin: 0;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+  }
+}
+
+.source {
+  flex: 2;
+  display: flex;
+
+  &__pre {
+    overflow: auto;
+    padding: 1em;
+    border-top: 1px solid transparentize($color-black, 0.9);
+    font-family: $font-monospace;
+    line-height: 1.4;
+    font-size: 1.1em;
+    margin: 0;
+    background: $color-light;
+    flex: 1;
+
+    &:not(.active) {
+      display: none;
+    }
+  }
+
+  &__highlighted-line {
+    background: $color-red;
+    display: inline-block;
+    width: 100%;
+    box-shadow: -1em 0 0 0.3em $color-red, 1em 0 0 0.3em $color-red;
+    color: white;
+    * {
+      color: white !important;
+    }
+  }
+
+  &__line-number .hljs-number {
+    color: lighten($color-gray, 30%);
+  }
+}
+
+.stack {
+  flex: 1;
+  overflow: auto;
+
+  &__list {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+    font-family: $font-monospace;
+    cursor: pointer;
+  }
+
+  &__list__item {
+    width: 100%;
+    border: 0;
+    background: $color-white;
+    margin: 0;
+    font: inherit;
+    text-align: left;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    padding: 1em;
+    cursor: pointer;
+    border-top: 1px solid transparentize($color-black, 0.9);
+
+    &__file {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      position: relative;
+      display: block;
+      margin-bottom: 0.2em;
+    }
+
+    .active & {
+      border: 1px solid transparentize($color-black, 0.9);
+      background-color: $color-blue;
+      color: $color-white;
+
+      &:active {
+        color: $color-white;
+      }
+    }
+
+    .active + li & {
+      border-top: 0;
+    }
+
+    &:active {
+      color: $color-gray;
+    }
+
+    &__function {
+      margin: 0;
+    }
+  }
+}
+
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+  color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+  color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+  color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+  color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+  color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #8959a8;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
