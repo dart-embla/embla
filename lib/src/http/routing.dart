@@ -58,7 +58,7 @@ class Route extends Middleware {
       String path,
       PipelineFactory pipeline) =>
       new Route._(
-          methods.map((m) => m.toUpperCase()) as Iterable<String>,
+          methods.map((m) => m.toUpperCase()),
           path.split('/').where((s) => s != '').join('/'),
           pipeline
       );

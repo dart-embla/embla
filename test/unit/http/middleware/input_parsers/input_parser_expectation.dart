@@ -9,6 +9,5 @@ Future expectParserOutput(InputParser parser, String input, dynamic expectedOutp
 
 Stream<List<int>> _stringToCharStream(String input) {
   final Stream<String> lines = new Stream<String>.fromIterable(input.split('\n'));
-  return lines.map/*<List<int>>*/(UTF8.encode) as Stream<List<int>>;
+  return lines.map/*<List<int>>*/(UTF8.encode);
 }
-

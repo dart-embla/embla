@@ -19,7 +19,7 @@ class TraceFormatter {
     final frames = chain.terse.traces
       .expand((t) => t.frames)
       .toList()
-      .reversed as Iterable<Frame>;
+      .reversed;
 
     if (frames.any(_isTraceIdentifier)) {
       return frames.skipWhile((f) => !_isTraceIdentifier(f)).skip(1);

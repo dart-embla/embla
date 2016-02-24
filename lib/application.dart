@@ -19,7 +19,7 @@ class Application {
         container,
         new List.unmodifiable(
             (await Future.wait(
-                bootstrappers.map((b) => _timeline(container, b)) as Iterable<Future>
+                bootstrappers.map((b) => _timeline(container, b))
             )).where((b) => b != null)
         )
     );
@@ -36,7 +36,7 @@ class Application {
   }
 
   Future exit() async {
-    await Future.wait(bootstrappers.map/*<Future>*/((b) async => b._exit()) as Iterable<Future>);
+    await Future.wait(bootstrappers.map/*<Future>*/((b) async => b._exit()));
   }
 }
 
@@ -102,7 +102,7 @@ abstract class Bootstrapper {
   Future _callAnnotation(Iterable<MethodMirror> methods, annotation) async {
     await Future.wait(
         _annotated(methods, annotation)
-            .map/*<Future>*/((c) => _runClosure(c)) as Iterable<Future>
+            .map/*<Future>*/((c) => _runClosure(c))
     );
   }
 
