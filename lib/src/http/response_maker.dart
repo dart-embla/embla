@@ -69,9 +69,7 @@ class DataResponse {
 
   Response status(int statusCode) {
     final outputBody = () {
-      if (body is Stream<String>) {
-        return body.map/*<List<int>>*/(UTF8.encode);
-      } else if (body is Stream<Object>) {
+      if (body is Stream) {
         return jsonStream(body).map/*<List<int>>*/(UTF8.encode);
       } else if (body is String) {
         return body;
@@ -85,16 +83,17 @@ class DataResponse {
   }
 
   Stream<String> jsonStream(Stream<Object> stream) async* {
-    yield '[';
-    bool isFirst = true;
+    bool isString;
     await for (final item in stream) {
-      if (isFirst) {
-        isFirst = false;
+      if (isString == null) {
+        isString = item is String;
+        if (!isString) yield '[';
       } else {
-        yield ',';
+        if (!isString) yield ',';
       }
-      yield JSON.encode(item);
+      if (!isString) yield JSON.encode(item);
+      else yield item;
     }
-    yield ']';
+    if (!isString) yield ']';
   }
 }

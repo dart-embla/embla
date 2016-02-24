@@ -8,7 +8,6 @@ import 'src/http/http_exceptions.dart';
 import 'src/util/trace_formatting.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'src/http/error_template.dart';
 
 export 'src/http/http_exceptions.dart';
 export 'src/http/request_response.dart';
