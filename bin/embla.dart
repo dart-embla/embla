@@ -46,10 +46,10 @@ main(List<String> arguments) async {
       print(l[0]);
       print('Listening for changes...');
       await changeBroadcast.stream.first;
-      process.complete(0);
+      if (!process.isCompleted) process.complete(0);
     });
     exitPort.listen((_) {
-      process.complete(0);
+      if (!process.isCompleted) process.complete(0);
     });
 
     exitCode = await process.future;

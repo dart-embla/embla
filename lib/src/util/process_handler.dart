@@ -50,6 +50,7 @@ class ProcessHandler {
   }
 
   Future interrupt() async {
+    if (_performTeardown.isCompleted) return;
     terminal.print(null, null, null, '<green>Reloading...</green>');
     _performTeardown.complete(null);
   }
