@@ -12,6 +12,10 @@ setUpContextForTesting({Map<String, dynamic> values}) {
   }..addAll(values ?? {}));
 }
 
+bool get isInHttpContext {
+  return _testingContext != null || Zone.current[_contextZoneValueKey] != null;
+}
+
 HttpContext get context => _testingContext ?? Zone.current[_contextZoneValueKey]
   ?? (throw new Exception('You have to [runInContext] before accessing the current context'));
 

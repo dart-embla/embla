@@ -6,10 +6,11 @@ import 'src/http/pipeline.dart';
 import 'src/http/request_response.dart';
 import 'src/http/http_exceptions.dart';
 import 'src/util/trace_formatting.dart';
+import 'src/http/context.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'src/http/context.dart';
+export 'src/http/context.dart';
 export 'src/http/http_exceptions.dart';
 export 'src/http/request_response.dart';
 export 'src/http/pipeline.dart';
@@ -83,6 +84,9 @@ class HttpBootstrapper extends Bootstrapper {
 
   Future<Response> handleRequest(Request request, Pipeline pipe) async {
     Future<Response> run() async {
+       context.container = context.container
+         .bind(Request, to: request);
+
       try {
         return await pipe(request);
       } on NoResponseFromPipelineException {
