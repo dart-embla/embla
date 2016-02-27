@@ -3,6 +3,7 @@ import 'package:quark/test_double.dart';
 import 'package:embla/http.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:embla/container.dart';
 export 'package:quark/init.dart';
 
 class HttpBootstrapperTest extends UnitTest {
@@ -45,7 +46,7 @@ class HttpBootstrapperTest extends UnitTest {
         () => 'response'
     );
     final boot = bootstrapper(server, pipelineFactory);
-    final Pipeline pipeline = pipelineFactory();
+    final Pipeline pipeline = pipelineFactory(new IoCContainer());
 
     final request = new Request('GET', new Uri.http('localhost', '/'));
     final response = await boot.handleRequest(request, pipeline);

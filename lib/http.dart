@@ -9,12 +9,12 @@ import 'src/util/trace_formatting.dart';
 import 'dart:async';
 import 'dart:convert';
 
+import 'src/http/context.dart';
 export 'src/http/http_exceptions.dart';
 export 'src/http/request_response.dart';
 export 'src/http/pipeline.dart';
 export 'src/http/middleware.dart';
 export 'src/http/routing.dart';
-export 'src/http/helpers.dart';
 
 typedef Future<HttpServer> ServerFactory(dynamic host, int port);
 
@@ -47,13 +47,13 @@ class HttpBootstrapper extends Bootstrapper {
 
   @Hook.bindings
   bindings() async {
-    container.singleton(await _serverFactory(this.host, this.port), as: HttpServer);
-    container.singleton(pipeline, as: Pipeline);
+    return container
+      .bind(HttpServer, to: await _serverFactory(this.host, this.port));
   }
 
   @Hook.interaction
   start(HttpServer server) {
-    final pipe = pipeline();
+    final pipe = pipeline(container);
     server.autoCompress = true;
     server.listen((request) {
       request.response.bufferOutput = true;
@@ -82,16 +82,19 @@ class HttpBootstrapper extends Bootstrapper {
   }
 
   Future<Response> handleRequest(Request request, Pipeline pipe) async {
-    try {
-      return await pipe(request);
-    } on NoResponseFromPipelineException {
-      return new Response.notFound('Not Found');
-    } on HttpException catch(e) {
-      return _responseMaker.parse(e.body).status(e.statusCode);
-    } catch(e, s) {
-      TraceFormatter.print(e, s);
-      return new Response.internalServerError(body: 'Internal Server Error');
+    Future<Response> run() async {
+      try {
+        return await pipe(request);
+      } on NoResponseFromPipelineException {
+        return new Response.notFound('Not Found');
+      } on HttpException catch(e) {
+        return _responseMaker.parse(e.body).status(e.statusCode);
+      } catch(e, s) {
+        TraceFormatter.print(e, s);
+        return new Response.internalServerError(body: 'Internal Server Error');
+      }
     }
+    return runInContext/*<Future<Response>>*/(container, run);
   }
 
   @Hook.exit

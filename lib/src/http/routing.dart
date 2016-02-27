@@ -76,14 +76,12 @@ class Route extends Middleware {
     final wildcards = _expander.parseWildcards(path, url);
     if (regexPath.hasMatch(url)) {
       try {
+        for (final wc in wildcards.keys) {
+          context.container = context.container
+            .bindName(wc, to: wildcards[wc]);
+        }
         return await pipeline()(request.change(
-            path: _expander.prefix(path, url),
-            context: {
-              'embla:wildcards': new Map.unmodifiable(
-                  new Map.from(request.context['embla:wildcards'] ?? {})
-                    ..addAll(wildcards)
-              )
-            }
+            path: _expander.prefix(path, url)
         ));
       } on NoResponseFromPipelineException {
         return await super.handle(request);

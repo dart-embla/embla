@@ -238,6 +238,18 @@ class IoCContainer implements interface.IoCContainer {
       throw new ArgumentError.value(null, paramName, 'Must be supplied');
     }
   }
+
+  @override
+  IoCContainer apply(interface.IoCContainer other) {
+    if (other is! IoCContainer) {
+      throw new ArgumentError.value(other, 'other', 'Must be the same implementation');
+    }
+    final IoCContainer otherC = other;
+    return new IoCContainer(
+      bindings: merge(bindings, otherC.bindings),
+      nameBindings: merge(nameBindings, otherC.nameBindings)
+    );
+  }
 }
 
 class CurriedFunction implements Function {

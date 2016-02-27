@@ -3,8 +3,14 @@ export 'package:quark/init.dart';
 import 'package:embla/src/http/middleware/error_handler_middleware.dart';
 import 'middleware_call.dart';
 import 'package:stack_trace/stack_trace.dart';
+import 'package:embla/src/http/context.dart';
 
 class ErrorHandlerMiddlewareTest extends UnitTest {
+  @before
+  setUp() {
+    setUpContextForTesting();
+  }
+
   @test
   itDoesNothingWithoutRegisteringHandlers() async {
     final middleware = new ErrorHandlerMiddleware();

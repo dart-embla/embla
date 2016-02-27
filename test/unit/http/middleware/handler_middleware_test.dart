@@ -1,13 +1,18 @@
 import 'package:quark/unit.dart';
 export 'package:quark/init.dart';
-import 'package:container/container.dart';
 import 'package:embla/src/http/middleware/handler_middleware.dart';
 import 'dart:async';
 import 'middleware_call.dart';
+import 'package:embla/src/http/context.dart';
 
 class HandlerMiddlewareTest extends UnitTest {
-  Future expectResponse(Function handler, String expectedBody, [Container container]) async {
-    final middleware = new HandlerMiddleware(handler, container ?? new Container());
+  @before
+  setUp() {
+    setUpContextForTesting();
+  }
+
+  Future expectResponse(Function handler, String expectedBody) async {
+    final middleware = new HandlerMiddleware(handler);
     await expectMiddlewareResponseBody(middleware, expectedBody);
   }
 
@@ -28,9 +33,10 @@ class HandlerMiddlewareTest extends UnitTest {
 
   @test
   itSupportsInjection() async {
-    final container = new Container();
-    container.singleton(new ValueObject('y'));
-    await expectResponse((ValueObject obj) => obj, '{"property":"y"}', container);
+    final middleware = new HandlerMiddleware((ValueObject obj) => obj);
+    middleware.context.container = middleware.context.container
+      .bind(ValueObject, to: new ValueObject('y'));
+    await expectMiddlewareResponseBody(middleware, '{"property":"y"}');
   }
 }
 

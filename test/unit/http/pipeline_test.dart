@@ -3,8 +3,14 @@ export 'package:quark/init.dart';
 import 'package:embla/http.dart';
 import 'package:embla/http_annotations.dart';
 import 'dart:async';
+import 'package:embla/src/http/context.dart';
 
 class PipelineTest extends UnitTest {
+  @before
+  setUp() {
+    setUpContextForTesting();
+  }
+
   Request request(String path, String method) => new Request(method, new Uri.http('localhost', path));
 
   Future expectResponse(String method, String path, PipelineFactory pipeline, String body) async {
@@ -64,7 +70,7 @@ class PipelineTest extends UnitTest {
   }
 
   @test
-  isHandlesWildcards() async {
+  itHandlesWildcards() async {
     await expectResponse('GET', '/foo/a/b',
         pipe(
             Route.get('foo/:x/:y',

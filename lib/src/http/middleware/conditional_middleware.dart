@@ -7,13 +7,13 @@ class ConditionalMiddleware extends Middleware {
   final Function condition;
   final Pipeline pipeline;
 
-  ConditionalMiddleware(condition(Request request), PipelineFactory pipeline)
+  ConditionalMiddleware(Function condition, PipelineFactory pipeline)
       : condition = condition,
         pipeline = pipeline();
 
   @override Future<Response> handle(Request request) async {
     try {
-      if (await condition(request)) {
+      if (await context.container.resolve(condition)) {
         return await pipeline(request);
       } else {
         return await super.handle(request);

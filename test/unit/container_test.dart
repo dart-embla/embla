@@ -172,6 +172,15 @@ class IoCContainerTest extends UnitTest {
     expect(() => c.decorate(String, withDecorator: null), throwsArgumentError);
     expect(() => c.decorate(null, withDecorator: String), throwsArgumentError);
   }
+
+  @test
+  itCanCombineItselfWithAnotherContainer() {
+    final ca = c.bind(String, to: 'x').bind(int, to: 1);
+    final cb = c.bind(String, to: 'y');
+    final cc = ca.apply(cb);
+    expect(cc.make(String), 'y');
+    expect(cc.make(int), 1);
+  }
 }
 
 typedef Typedef();

@@ -3,12 +3,13 @@ import 'dart:mirrors';
 
 import 'package:shelf/shelf.dart' as shelf;
 
-import '../util/helper_container.dart';
 import '../util/nothing.dart';
 import 'middleware.dart';
 import 'middleware/conditional_middleware.dart';
 import 'middleware/handler_middleware.dart';
 import 'request_response.dart';
+import 'context.dart';
+import '../../container.dart';
 
 PipelineFactory pipe(
     [middlewareA = nothing, middlewareB = nothing, middlewareC = nothing,
@@ -24,7 +25,7 @@ PipelineFactory pipe(
   middlewareO, middlewareP, middlewareQ, middlewareR, middlewareS, middlewareT,
   middlewareU, middlewareV, middlewareW, middlewareX, middlewareY, middlewareZ
   ].where((m) => m != nothing);
-  return () => pipeActual(resolveMiddleware(middlewareTokens));
+  return ([IoCContainer container]) => pipeActual(resolveMiddleware(middlewareTokens, container));
 }
 
 Pipeline pipeActual(Iterable<shelf.Middleware> middleware) {
@@ -41,7 +42,8 @@ Pipeline pipeActual(Iterable<shelf.Middleware> middleware) {
   return pipeline;
 }
 
-Iterable<Middleware> resolveMiddleware(Iterable tokens) sync* {
+Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]) sync* {
+  final ioc = container ?? context.container;
   for (final token in tokens) {
     if (token is shelf.Middleware) {
       yield token;
@@ -51,7 +53,7 @@ Iterable<Middleware> resolveMiddleware(Iterable tokens) sync* {
       if (!reflectType(token).isAssignableTo(reflectType(Middleware))) {
         throw new Exception('[$token] must be an instance of [Middleware]');
       }
-      yield helperContainer.make(token);
+      yield ioc.make(token);
     } else if (token is Iterable) {
       yield* resolveMiddleware(token);
     }
@@ -60,11 +62,11 @@ Iterable<Middleware> resolveMiddleware(Iterable tokens) sync* {
 
 typedef Future<Response> Pipeline(Request request);
 
-typedef Pipeline PipelineFactory();
+typedef Pipeline PipelineFactory([IoCContainer container]);
 
 class NoResponseFromPipelineException implements Exception {}
 
-Middleware handler(Function handler) => new HandlerMiddleware(handler, helperContainer);
+Middleware handler(Function handler) => new HandlerMiddleware(handler);
 
 Middleware pipeIf(bool condition(Request request), [middlewareA = nothing, middlewareB = nothing, middlewareC = nothing,
 middlewareD = nothing, middlewareE = nothing, middlewareF = nothing, middlewareG = nothing,

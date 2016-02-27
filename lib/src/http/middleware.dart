@@ -9,9 +9,13 @@ export 'http_exceptions.dart';
 export 'request_response.dart';
 import 'request_response.dart';
 
+import 'context.dart' as http_context;
+
 class Middleware {
   final ResponseMaker _responseMaker = new ResponseMaker();
   shelf.Handler _innerHandler;
+
+  http_context.HttpContext get context => http_context.context;
 
   abort([int statusCode = 500, body = 'Something went wrong']) {
     throw new HttpException(statusCode, body);
@@ -181,16 +185,6 @@ class Middleware {
 
   Future<Response> handle(Request request) async {
     return await _innerHandler(request);
-  }
-
-  Map<Type, Object> injections(Request request) {
-    return request.context['embla:injections'] as Map<Type, Object>
-        ?? <Type, Object>{};
-  }
-
-  Map<String, dynamic> locals(Request request) {
-    return request.context['embla:locals'] as Map<String, dynamic>
-        ?? <String, dynamic>{};
   }
 
   Response ok(anything) {

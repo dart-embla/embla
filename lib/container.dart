@@ -133,4 +133,16 @@ abstract class IoCContainer {
   ///      .greet()
   ///     ); // HELLO, WORLD!!
   IoCContainer decorate(Type type, {Type withDecorator});
+
+  /// Combines all bindings from the [other] container with this one's, and returns a new
+  /// instance that combines the bindings. The bindings in [other] takes precedence.
+  ///
+  ///     var a = new IoCContainer().bind(int, toValue: 1).bind(String, toValue: "x");
+  ///     var b = new IoCContainer().bind(int, toValue: 2);
+  ///     var c = a.apply(b);
+  ///     c.resolve((int i, String s) {
+  ///       print(s); // x
+  ///       print(i); // 2
+  ///     });
+  IoCContainer apply(IoCContainer other);
 }

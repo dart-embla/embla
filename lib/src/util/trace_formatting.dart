@@ -35,6 +35,10 @@ class TraceFormatter {
       .where((f) => !f.member.startsWith('_'))
       .where((f) => !new RegExp('<fn>|<async>').hasMatch(f.member)).toList();
 
+    if (frames.length == 0) {
+      return frames;
+    }
+
     if (frames.last != unfilteredFrames.last)
       frames.add(unfilteredFrames.last);
 
@@ -53,6 +57,7 @@ class TraceFormatter {
   }
 
   String get formatted {
+    if (frames.length == 0) return '';
     return frames.take(frames.length - 1).map(_formatFrame).join('\n')
     + '\n${_formatFrame(frames.last, error: true)}';
   }

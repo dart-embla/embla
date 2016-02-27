@@ -3,8 +3,6 @@ import 'dart:mirrors';
 
 import 'package:stack_trace/stack_trace.dart';
 
-import '../../http/helpers.dart';
-import '../../util/helper_container.dart';
 import '../../util/nothing.dart';
 import '../middleware.dart';
 import '../pipeline.dart';
@@ -65,12 +63,13 @@ class ErrorHandlerCollection extends Middleware {
     final mirror = reflect(error);
     for (final type in _catches.keys) {
       if (mirror.type.isAssignableTo(reflectType(type))) {
-        return applyInjections({
-          error.runtimeType: error,
-          type: error,
-          StackTrace: stack,
-          Chain: new Chain.forTrace(stack)
-        })(_catches[type])(request);
+        context.container = context.container
+          .bind(error.runtimeType, to: error)
+          .bind(type, to: error)
+          .bind(StackTrace, to: stack)
+          .bind(Chain, to: new Chain.forTrace(stack));
+
+        return _catches[type](request);
       }
     }
     return _errorTemplate.catchError(error, stack);
@@ -86,7 +85,7 @@ class ErrorHandlerMiddleware extends Middleware {
 
   static ErrorHandlerCollection catchAll(Function handler) {
     return new ErrorHandlerCollection({dynamic: pipeActual(resolveMiddleware([
-      new HandlerMiddleware(handler, helperContainer)
+      new HandlerMiddleware(handler)
     ]))});
   }
 

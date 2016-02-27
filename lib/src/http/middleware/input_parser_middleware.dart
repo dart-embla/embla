@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io' show ContentType;
 
 import '../middleware.dart';
-import '../helpers.dart';
 import '../request_response.dart';
 
 class Input {
@@ -29,11 +28,12 @@ class InputParserMiddleware extends Middleware {
   final JsonInputParser _json = new JsonInputParser();
 
   @override Future<Response> handle(Request request) async {
-    final withInput = applyInjections({
-      Input: await _getInput(request)
-    });
+    context.container = context.container
+      .bind(Input, to: await _getInput(request));
 
-    return await withInput(super.handle)(request.change(body: null));
+    //print(context.container.make(Input));
+
+    return await super.handle(request.change(body: null));
   }
 
   ContentType _contentType(Request request) {
