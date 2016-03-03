@@ -13,8 +13,14 @@ class ResponseMaker {
       return new DataResponse((anything ?? '').toString(), ContentType.HTML);
     }
 
-    if (anything is Stream<String>) {
-      return new DataResponse(anything, ContentType.HTML);
+    if (anything is Stream) {
+      final typeArgument = reflect(anything).type.typeArguments[0];
+      final json = typeArgument.reflectedType == dynamic
+                || !typeArgument.isSubtypeOf(reflectType(String));
+      if (json) {
+        return new DataResponse(_serialize(anything), ContentType.JSON);
+      }
+      return new DataResponse(_serialize(anything), ContentType.HTML);
     }
 
     return new DataResponse(_serialize(anything), ContentType.JSON);
@@ -26,6 +32,10 @@ class ResponseMaker {
         anything is bool ||
         anything is num) {
       return anything;
+    }
+
+    if (anything is DateTime) {
+      return anything.toUtc().toIso8601String();
     }
 
     if (anything is Stream<Object>) {
@@ -55,9 +65,17 @@ class ResponseMaker {
         .where((m) => m.isGetter)
         .where((m) => !m.isPrivate);
     return new Map.unmodifiable(new Map.fromIterables(
-       members.map((m) => m.simpleName).map(MirrorSystem.getName),
+       members.map((m) => m.simpleName).map(MirrorSystem.getName).map(_toSnakeCase),
        members.map((m) => _serialize(mirror.getField(m.simpleName).reflectee))
     ));
+  }
+
+  String _toSnakeCase(String input) {
+    return input
+      .split('_')
+      .expand((p) => p.split(new RegExp(r'(?=[A-Z])')))
+      .map((s) => s.toLowerCase())
+      .join('_');
   }
 }
 
@@ -83,17 +101,18 @@ class DataResponse {
   }
 
   Stream<String> jsonStream(Stream<Object> stream) async* {
-    bool isString;
+    bool jsonTarget = contentType == ContentType.JSON;
+    bool first = true;
+    if (jsonTarget) yield '[';
     await for (final item in stream) {
-      if (isString == null) {
-        isString = item is String;
-        if (!isString) yield '[';
+      if (first) {
+        first = false;
       } else {
-        if (!isString) yield ',';
+        if (jsonTarget) yield ',';
       }
-      if (!isString) yield JSON.encode(item);
+      if (jsonTarget) yield JSON.encode(item);
       else yield item;
     }
-    if (!isString) yield ']';
+    if (jsonTarget) yield ']';
   }
 }

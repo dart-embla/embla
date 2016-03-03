@@ -70,6 +70,21 @@ class ResponseMakerTest extends UnitTest {
     expect(r.contentType, ContentType.HTML);
     expect(await r.body.toList(), ['a', 'b', 'c']);
   }
+
+  @test
+  itConvertsTheCaseInObjectJsonOutput() async {
+    parses(
+        new WeirdCase(),
+        {
+          'camel_case': null,
+          'snake_case': null,
+          'upper_camel_case': null,
+          'weird_one1': null,
+          'super_weird_number_2': null,
+        },
+        ContentType.JSON
+    );
+  }
 }
 
 class MyClass {
@@ -82,4 +97,12 @@ class MyNestingClass {
   final MyClass nested;
 
   MyNestingClass(this.nested);
+}
+
+class WeirdCase {
+  final camelCase = null;
+  final snake_case = null;
+  final UpperCamelCase = null;
+  final Weird_One1 = null;
+  final superWeird_Number_2 = null;
 }
