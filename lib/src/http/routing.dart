@@ -79,6 +79,14 @@ class Route extends Middleware {
         for (final wc in wildcards.keys) {
           context.container = context.container
             .bindName(wc, to: wildcards[wc]);
+          if (new RegExp(r'\d+').hasMatch(wildcards[wc])) {
+            context.container = context.container
+              .bindName(wc, to: int.parse(wildcards[wc]));
+          }
+          if (new RegExp(r'\d*\.\d+').hasMatch(wildcards[wc])) {
+            context.container = context.container
+              .bindName(wc, to: double.parse(wildcards[wc]));
+          }
         }
         return await pipeline()(request.change(
             path: _expander.prefix(path, url)
