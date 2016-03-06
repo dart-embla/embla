@@ -51,7 +51,7 @@ Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]
       yield handler(token);
     } else if (token is Type) {
       if (!reflectType(token).isAssignableTo(reflectType(Middleware))) {
-        throw new Exception('[$token] must be assignable to [Middleware]');
+        throw new TypeError('[$token] must be assignable to [Middleware]');
       }
       yield ioc.make(token);
     } else if (token is Iterable) {
