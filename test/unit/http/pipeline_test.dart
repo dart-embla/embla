@@ -4,6 +4,7 @@ import 'package:embla/http.dart';
 import 'package:embla/http_annotations.dart';
 import 'dart:async';
 import 'package:embla/src/http/context.dart';
+import 'package:shelf/shelf.dart' as shelf;
 
 class PipelineTest extends UnitTest {
   @before
@@ -11,7 +12,11 @@ class PipelineTest extends UnitTest {
     setUpContextForTesting();
   }
 
-  Request request(String path, String method) => new Request(method, new Uri.http('localhost', path));
+  Request request(String path, String method) {
+    final request = new Request(method, new Uri.http('localhost', path));
+    context.container = context.container.bind(Request, to: request);
+    return request;
+  }
 
   Future expectResponse(String method, String path, PipelineFactory pipeline, String body) async {
     expect(
@@ -91,6 +96,24 @@ class PipelineTest extends UnitTest {
     await expectResponse('GET', 'x',
         pipe(MyController),
         '{"property":"x"}'
+    );
+  }
+
+  @test
+  aShelfMiddlewareCanBeUsedDirectly() async {
+    bool wasCalled = false;
+
+    await expectResponse('GET', '/',
+        pipe(
+          (shelf.Handler innerHandler) {
+            return (Request request) {
+              wasCalled = true;
+              return innerHandler(request);
+            };
+          },
+          (Request request) => '$wasCalled,${request.url}'
+        ),
+        'true,'
     );
   }
 }

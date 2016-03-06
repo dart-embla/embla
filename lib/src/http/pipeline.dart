@@ -51,7 +51,7 @@ Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]
       yield handler(token);
     } else if (token is Type) {
       if (!reflectType(token).isAssignableTo(reflectType(Middleware))) {
-        throw new Exception('[$token] must be an instance of [Middleware]');
+        throw new Exception('[$token] must be assignable to [Middleware]');
       }
       yield ioc.make(token);
     } else if (token is Iterable) {
@@ -67,6 +67,12 @@ typedef Pipeline PipelineFactory([IoCContainer container]);
 class NoResponseFromPipelineException implements Exception {}
 
 Middleware handler(Function handler) => new HandlerMiddleware(handler);
+
+shelf.Middleware middleware(shelf.Middleware middleware) {
+  return (shelf.Handler innerHandler) {
+    return middleware(innerHandler);
+  };
+}
 
 Middleware pipeIf(bool condition(Request request), [middlewareA = nothing, middlewareB = nothing, middlewareC = nothing,
 middlewareD = nothing, middlewareE = nothing, middlewareF = nothing, middlewareG = nothing,
