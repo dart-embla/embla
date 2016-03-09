@@ -4,9 +4,7 @@ import 'http.dart';
 import 'src/http/middleware/input_parser_middleware.dart';
 import 'src/http/middleware/logger_middleware.dart';
 import 'src/http/middleware/remove_trailing_slash_middleware.dart';
-import 'src/http/middleware/forwarder_middleware.dart';
-import 'src/http/middleware/static_files_middleware.dart';
-import 'src/http/middleware/conditional_middleware.dart';
+import 'src/http/middleware/pub_middleware.dart';
 
 export 'src/http/middleware/conditional_middleware.dart';
 export 'src/http/middleware/error_handler_middleware.dart';
@@ -33,14 +31,14 @@ Iterable<Type> get basicMiddleware => [
 ///
 /// [servePort] and [buildDir] can be used if the default serve and build options are
 /// used with pub.
-Iterable<Middleware> staticPubBuild({
+Middleware pub({
   bool developmentMode,
   int servePort: 8080,
   String buildDir: 'build'
 }) {
-  final devMode = developmentMode ?? Platform.environment['APP_ENV'] == 'development';
-  return [
-    pipeIf(() => devMode, new ForwarderMiddleware(to: 'http://localhost:$servePort')),
-    new StaticFilesMiddleware(fileSystemPath: '$buildDir/web', defaultDocument: 'index.html')
-  ];
+  return new PubMiddleware(
+    developmentMode: developmentMode,
+    servePort: servePort,
+    buildDir: buildDir
+  );
 }

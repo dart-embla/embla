@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../middleware.dart';
+import '../middleware.dart' hide HttpException;
 
 class ForwarderMiddleware extends Middleware {
   final String prefix;
@@ -45,6 +45,8 @@ class ForwarderMiddleware extends Middleware {
       );
     } on SocketException {
       abortBadGateway('Could not forward to $url');
+    } on HttpException catch(e) {
+      abortInternalServerError(e.message);
     } finally {
       httpClient.close();
     }
