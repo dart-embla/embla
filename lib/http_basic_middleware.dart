@@ -20,25 +20,3 @@ Iterable<Type> get basicMiddleware => [
   LoggerMiddleware,
   InputParserMiddleware,
 ];
-
-/// Enables integration with pub workflow. If the application is in development mode,
-/// requests will be forwarded to `pub serve`. If not in dev mode, *build/web* will be
-/// used for static assets.
-///
-/// [developmentMode] will determine whether or not the app is in dev mode. If omitted,
-/// a check for an environment variable called `APP_ENV` having value 'development' will
-/// be the default check.
-///
-/// [servePort] and [buildDir] can be used if the default serve and build options are
-/// used with pub.
-Middleware pub({
-  bool developmentMode,
-  int servePort: 8080,
-  String buildDir: 'build'
-}) {
-  return new PubMiddleware(
-    developmentMode: developmentMode,
-    servePort: servePort,
-    buildDir: buildDir
-  );
-}

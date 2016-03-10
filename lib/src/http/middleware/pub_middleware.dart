@@ -5,6 +5,9 @@ import '../../../http.dart';
 import 'forwarder_middleware.dart';
 import 'static_files_middleware.dart';
 
+/// Enables integration with pub workflow. If the application is in development mode,
+/// requests will be forwarded to `pub serve`. If not in dev mode, *build/web* will be
+/// used for static assets.
 class PubMiddleware extends Middleware {
   final bool developmentMode;
   final int servePort;
@@ -18,6 +21,12 @@ class PubMiddleware extends Middleware {
   Middleware get _forward => __forward
     ??= new ForwarderMiddleware(to: 'http://localhost:$servePort');
 
+  /// [developmentMode] will determine whether or not the app is in dev mode. If omitted,
+  /// a check for an environment variable called `APP_ENV` having value 'development' will
+  /// be the default check.
+  ///
+  /// [servePort] and [buildDir] can be used if the default serve and build options are not
+  /// used with pub.
   PubMiddleware({
     bool developmentMode,
     this.servePort: 8080,
