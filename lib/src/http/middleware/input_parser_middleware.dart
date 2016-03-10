@@ -117,8 +117,8 @@ class UrlEncodedInputParser extends InputParser {
     _verifyQueryString(query);
 
     final parts = query.split('&');
-    final Iterable<String> rawKeys = parts.map((s) => s.split('=').first);
-    final List<String> values = parts.map((s) => s.split('=').last).toList();
+    final Iterable<String> rawKeys = parts.map((s) => s.split('=').map(Uri.decodeComponent).first);
+    final List<String> values = parts.map((s) => s.split('=').map(Uri.decodeComponent).last).toList();
     final map = {};
     final rootNamePattern = new RegExp(r'^([^\[]+)(.*)$');
     final contPattern = new RegExp(r'^\[(.*?)\](.*)$');

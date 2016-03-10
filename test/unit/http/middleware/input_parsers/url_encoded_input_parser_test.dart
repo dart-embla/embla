@@ -12,5 +12,6 @@ class UrlEncodedInputParserTest extends UnitTest {
     await expectParserOutput(parser, 'y[]=1&y[]=2', {'y': [1, 2]});
     await expectParserOutput(parser, 'y[0][key]=1&y[0][key2]=2', {'y': [{'key': 1, 'key2': 2}]});
     await expectParserOutput(parser, 'y[0][key][]=1&y[0][key][]=2', {'y': [{'key': [1, 2]}]});
+    await expectParserOutput(parser, 'urlencoded%20key=urlencoded%20value', {'urlencoded key': 'urlencoded value'});
   }
 }

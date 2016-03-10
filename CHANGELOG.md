@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.2
+* Fixed a bug where routing stars didn't require a slash to follow:
+
+```dart
+Route.get('path/*')
+// no longer matches "/path_and_more"
+// only "/path/and_more"
+```
+
+* Fixed a bug where the `UrlEncodedInputParser` didn't actually decode the URL component:
+
+```dart
+key=value -> { 'key': 'value' }
+
+// before 0.2.2
+key=value%20with%20spaces -> { 'key': 'value%20with%20spaces' }
+// after 0.2.2
+key=value%20with%20spaces -> { 'key': 'value with spaces' }
+```
+
 ## 0.2.1
 Adds a new `ForwarderMiddleware` that acts as a proxy to another server.
 

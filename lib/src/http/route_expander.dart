@@ -25,8 +25,8 @@ class RouteExpander {
 
   String _expandStars(String input, bool exclude) {
     return input
-        .replaceAll(new RegExp(r'^\*$'), exclude ? '' : r'\/?(.*)')
-        .replaceAll(new RegExp(r'\\\/\*$'), exclude ? '' : r'\/?(.*)');
+        .replaceAll(new RegExp(r'^\*$'), exclude ? '' : r'(\/.*)?')
+        .replaceAll(new RegExp(r'\\\/\*$'), exclude ? '' : r'(\/.*)?');
   }
 
   String prefix(String pattern, String path) {

@@ -36,9 +36,9 @@ class RouteExpanderTest extends UnitTest {
 
   @test
   itExpandsAStar() {
-    expands('foo/*', r'^foo\/?(.*)$');
-    expands('/*', r'^\/?(.*)$');
-    expands('*', r'^\/?(.*)$');
+    expands('foo/*', r'^foo(\/.*)?$');
+    expands('/*', r'^(\/.*)?$');
+    expands('*', r'^(\/.*)?$');
   }
 
   @test
