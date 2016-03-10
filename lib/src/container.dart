@@ -202,6 +202,9 @@ class IoCContainer implements interface.IoCContainer {
         if (nameBindings.containsKey(p.simpleName)) {
           return _getBoundNamed(p);
         }
+        if (p.defaultValue.reflectee != null) {
+          return p.defaultValue.reflectee;
+        }
         return _makeOrNull(p.type.reflectedType);
       })
     );
