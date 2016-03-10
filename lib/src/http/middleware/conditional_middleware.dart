@@ -5,11 +5,12 @@ import '../request_response.dart';
 
 class ConditionalMiddleware extends Middleware {
   final Function condition;
-  final Pipeline pipeline;
+  final PipelineFactory _pipeline;
+  Pipeline __pipeline;
 
-  ConditionalMiddleware(Function condition, PipelineFactory pipeline)
-      : condition = condition,
-        pipeline = pipeline();
+  Pipeline get pipeline => (__pipeline ??= _pipeline()) as Pipeline;
+
+  ConditionalMiddleware(this.condition, this._pipeline);
 
   @override Future<Response> handle(Request request) async {
     try {

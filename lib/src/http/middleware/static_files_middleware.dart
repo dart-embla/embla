@@ -10,24 +10,20 @@ class StaticFilesMiddleware extends Middleware {
   final bool serveFilesOutsidePath;
   final String defaultDocument;
   final bool listDirectories;
-  final shelf.Handler handler;
+  shelf.Handler _handler;
+  shelf.Handler get handler => _handler ??= shelf_static.createStaticHandler(
+      fileSystemPath,
+      serveFilesOutsidePath: serveFilesOutsidePath,
+      defaultDocument: defaultDocument,
+      listDirectories: listDirectories
+  );
 
   StaticFilesMiddleware({
-  String fileSystemPath: 'web',
-  bool serveFilesOutsidePath: false,
-  String defaultDocument,
-  bool listDirectories: false
-  })
-      : fileSystemPath = fileSystemPath,
-        serveFilesOutsidePath = serveFilesOutsidePath,
-        defaultDocument = defaultDocument,
-        listDirectories = listDirectories,
-        handler = shelf_static.createStaticHandler(
-            fileSystemPath,
-            serveFilesOutsidePath: serveFilesOutsidePath,
-            defaultDocument: defaultDocument,
-            listDirectories: listDirectories
-        );
+    this.fileSystemPath: 'web',
+    this.serveFilesOutsidePath: false,
+    this.defaultDocument,
+    this.listDirectories: false
+  });
 
   @override Future<Response> handle(Request request) async {
     final Response response = await handler(request);
