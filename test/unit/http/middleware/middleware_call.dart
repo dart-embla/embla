@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart' as shelf;
 
 Future<Response> middlewareCall(Middleware middleware, [Request request, shelf.Handler handler]) async {
   return await middleware
-      .call((handler ?? (_) => throw new NoResponseFromPipelineException()) as shelf.Handler)
+      .call(handler ?? (_) => throw new NoResponseFromPipelineException())
       (request ?? new Request('GET', new Uri.http('localhost', '/')));
 }
 

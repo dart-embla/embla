@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.1
+Adds a new `ForwarderMiddleware` that acts as a proxy to another server.
+
+Also adds a `PubMiddleware` which combines the `StaticFilesMiddleware` and the new
+`ForwarderMiddleware` to forward to Pub serve in dev mode, and to the build directory in
+production mode.
+
+```dart
+pipe(
+  // Middleware preceding the PubMiddleware will now be available on the same server
+  // that deals with transformers and stuff!
+  Route.get('special-endpoint', () => 'Hello from server!'),
+  PubMiddleware  
+)
+```
+
+```shell
+> pub serve
+# In another tab
+> APP_ENV=development embla start
+```
+
 ## Pre 0.2
 An empty Embla app is an empty getter called `embla` in the script, with an export statement.
 
@@ -78,4 +100,3 @@ get embla => [
 
 There are some middleware that comes out-of-the-box, for routing as well as for some common tasks like
 removing trailing slashes from URLs, parsing the request body, or handling errors thrown in the pipeline.
-
