@@ -66,7 +66,7 @@ class Route extends Middleware {
   Route._(this.methods, this.path, this.pipeline);
 
   RegExp get regexPath => new RegExp(_expander.expand(path));
-  Pipeline get _pipeline => (__pipeline ??= pipeline()) as Pipeline;
+  Pipeline get _pipeline => __pipeline ??= pipeline();
 
   @override Future<Response> handle(Request request) async {
     if (!methods.contains(request.method)) {

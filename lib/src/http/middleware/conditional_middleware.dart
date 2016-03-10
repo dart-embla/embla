@@ -8,7 +8,7 @@ class ConditionalMiddleware extends Middleware {
   final PipelineFactory _pipeline;
   Pipeline __pipeline;
 
-  Pipeline get pipeline => (__pipeline ??= _pipeline()) as Pipeline;
+  Pipeline get pipeline => __pipeline ??= _pipeline();
 
   ConditionalMiddleware(this.condition, this._pipeline);
 

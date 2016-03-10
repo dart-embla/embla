@@ -42,7 +42,7 @@ Pipeline pipeActual(Iterable<shelf.Middleware> middleware) {
   return pipeline;
 }
 
-Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]) sync* {
+Iterable<shelf.Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]) sync* {
   final ioc = container ?? context.container;
   for (final token in tokens) {
     if (token is shelf.Middleware) {

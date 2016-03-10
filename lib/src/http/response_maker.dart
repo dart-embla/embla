@@ -39,7 +39,7 @@ class ResponseMaker {
     }
 
     if (anything is Stream<Object>) {
-      return anything.map(_serialize);
+      return anything.map((o) => _serialize(o));
     }
 
     if (anything is Iterable) {
