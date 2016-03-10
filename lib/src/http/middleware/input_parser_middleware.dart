@@ -123,11 +123,11 @@ class UrlEncodedInputParser extends InputParser {
     final rootNamePattern = new RegExp(r'^([^\[]+)(.*)$');
     final contPattern = new RegExp(r'^\[(.*?)\](.*)$');
     dynamic nextValue() {
-      return _raw.parseString(Uri.decodeComponent(values.removeAt(0)));
+      return _raw.parseString(Uri.decodeQueryComponent(values.removeAt(0)));
     }
     for (var restOfKey in rawKeys) {
       final rootMatch = rootNamePattern.firstMatch(restOfKey);
-      final rootKey = Uri.decodeComponent(rootMatch[1]);
+      final rootKey = Uri.decodeQueryComponent(rootMatch[1]);
       final rootCont = rootMatch[2];
       if (rootCont == '') {
         map[rootKey] = nextValue();
@@ -140,7 +140,7 @@ class UrlEncodedInputParser extends InputParser {
 
       while (contPattern.hasMatch(restOfKey)) {
         final contMatch = contPattern.firstMatch(restOfKey);
-        final keyName = Uri.decodeComponent(contMatch[1]);
+        final keyName = Uri.decodeQueryComponent(contMatch[1]);
         if (keyName == '') {
           target[targetKey] ??= [];
           (target[targetKey] as List).add(null);
@@ -158,7 +158,7 @@ class UrlEncodedInputParser extends InputParser {
           targetKey = index;
         } else {
           if (targetKey is String) {
-            targetKey = Uri.decodeComponent(targetKey);
+            targetKey = Uri.decodeQueryComponent(targetKey);
           }
           target[targetKey] ??= {};
           (target[targetKey] as Map)[keyName] ??= null;
