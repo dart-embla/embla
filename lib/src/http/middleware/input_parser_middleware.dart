@@ -117,17 +117,17 @@ class UrlEncodedInputParser extends InputParser {
     _verifyQueryString(query);
 
     final parts = query.split('&');
-    final Iterable<String> rawKeys = parts.map((s) => s.split('=').map(Uri.decodeComponent).first);
-    final List<String> values = parts.map((s) => s.split('=').map(Uri.decodeComponent).last).toList();
+    final Iterable<String> rawKeys = parts.map((s) => s.split('=').first);
+    final List<String> values = parts.map((s) => s.split('=').last).toList();
     final map = {};
     final rootNamePattern = new RegExp(r'^([^\[]+)(.*)$');
     final contPattern = new RegExp(r'^\[(.*?)\](.*)$');
     dynamic nextValue() {
-      return _raw.parseString(values.removeAt(0));
+      return _raw.parseString(Uri.decodeComponent(values.removeAt(0)));
     }
     for (var restOfKey in rawKeys) {
       final rootMatch = rootNamePattern.firstMatch(restOfKey);
-      final rootKey = rootMatch[1];
+      final rootKey = Uri.decodeComponent(rootMatch[1]);
       final rootCont = rootMatch[2];
       if (rootCont == '') {
         map[rootKey] = nextValue();
@@ -140,7 +140,7 @@ class UrlEncodedInputParser extends InputParser {
 
       while (contPattern.hasMatch(restOfKey)) {
         final contMatch = contPattern.firstMatch(restOfKey);
-        final keyName = contMatch[1];
+        final keyName = Uri.decodeComponent(contMatch[1]);
         if (keyName == '') {
           target[targetKey] ??= [];
           (target[targetKey] as List).add(null);
@@ -157,6 +157,9 @@ class UrlEncodedInputParser extends InputParser {
           target = targetList;
           targetKey = index;
         } else {
+          if (targetKey is String) {
+            targetKey = Uri.decodeComponent(targetKey);
+          }
           target[targetKey] ??= {};
           (target[targetKey] as Map)[keyName] ??= null;
           target = target[targetKey];
