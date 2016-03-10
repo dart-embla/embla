@@ -31,8 +31,6 @@ class InputParserMiddleware extends Middleware {
     context.container = context.container
       .bind(Input, to: await _getInput(request));
 
-    //print(context.container.make(Input));
-
     return await super.handle(request.change(body: null));
   }
 

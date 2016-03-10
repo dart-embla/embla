@@ -42,7 +42,7 @@ Pipeline pipeActual(Iterable<shelf.Middleware> middleware) {
   return pipeline;
 }
 
-Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]) sync* {
+Iterable<shelf.Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]) sync* {
   final ioc = container ?? context.container;
   for (final token in tokens) {
     if (token is shelf.Middleware) {
@@ -51,7 +51,7 @@ Iterable<Middleware> resolveMiddleware(Iterable tokens, [IoCContainer container]
       yield handler(token);
     } else if (token is Type) {
       if (!reflectType(token).isAssignableTo(reflectType(Middleware))) {
-        throw new TypeError('[$token] must be assignable to [Middleware]');
+        throw new ArgumentError('[$token] must be assignable to [Middleware]');
       }
       yield ioc.make(token);
     } else if (token is Iterable) {
@@ -74,7 +74,7 @@ shelf.Middleware middleware(shelf.Middleware middleware) {
   };
 }
 
-Middleware pipeIf(bool condition(Request request), [middlewareA = nothing, middlewareB = nothing, middlewareC = nothing,
+Middleware pipeIf(Function condition, [middlewareA = nothing, middlewareB = nothing, middlewareC = nothing,
 middlewareD = nothing, middlewareE = nothing, middlewareF = nothing, middlewareG = nothing,
 middlewareH = nothing, middlewareI = nothing, middlewareJ = nothing, middlewareK = nothing,
 middlewareL = nothing, middlewareM = nothing, middlewareN = nothing, middlewareO = nothing,

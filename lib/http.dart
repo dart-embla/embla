@@ -54,32 +54,34 @@ class HttpBootstrapper extends Bootstrapper {
 
   @Hook.interaction
   start(HttpServer server) {
-    final pipe = pipeline(container);
-    server.autoCompress = true;
-    server.listen((request) {
-      request.response.bufferOutput = true;
-      shelf_io.handleRequest(
-        request,
-        (_) => handleRequest(_, pipe).then((r) {
-          final c = new StreamController<List<int>>();
+    return runInContext(container, () {
+      final pipe = pipeline(container);
+      server.autoCompress = true;
+      server.listen((request) {
+        request.response.bufferOutput = true;
+        shelf_io.handleRequest(
+          request,
+          (_) => handleRequest(_, pipe).then((r) {
+            final c = new StreamController<List<int>>();
 
-          r.read().listen(c.add, onDone: c.close, onError: (e, s) {
-            c.add(UTF8.encode("""
-              <hr>
-              <p>
-                An error was thrown after headers were sent.
-              </p>
-              <h3>${e.toString().replaceAll("<", "&lt;")}</h3>
-              <pre>${s.toString().replaceAll("<", "&lt;")}</pre>
-              <hr>
-            """));
-          });
+            r.read().listen(c.add, onDone: c.close, onError: (e, s) {
+              c.add(UTF8.encode("""
+                <hr>
+                <p>
+                  An error was thrown after headers were sent.
+                </p>
+                <h3>${e.toString().replaceAll("<", "&lt;")}</h3>
+                <pre>${s.toString().replaceAll("<", "&lt;")}</pre>
+                <hr>
+              """));
+            });
 
-          return r.change(body: c.stream);
-        })
-      );
+            return r.change(body: c.stream);
+          })
+        );
+      });
+      print('<blue>Server started on <underline>http://${server.address.host}:${server.port}</underline></blue>');
     });
-    print('<blue>Server started on <underline>http://${server.address.host}:${server.port}</underline></blue>');
   }
 
   Future<Response> handleRequest(Request request, Pipeline pipe) async {

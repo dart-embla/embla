@@ -13,7 +13,7 @@ class InputParserMiddlewareTest extends UnitTest {
   }
 
   Response printJsonHandler(Request request) {
-    return new Response.ok(JSON.encode((context.container.make(Input) as Input).toJson()));
+    return new Response.ok(JSON.encode(context.container.make(Input).toJson()));
   }
 
   @test

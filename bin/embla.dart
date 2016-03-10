@@ -1,8 +1,10 @@
 #!/usr/bin/env dart
 
-import 'dart:isolate';
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
+
+import 'package:watcher/watcher.dart';
 
 main(List<String> arguments) async {
   if (arguments.length < 1) return print('Usage: embla start');
@@ -15,7 +17,7 @@ main(List<String> arguments) async {
   SendPort restartPort;
   StreamController changeBroadcast = new StreamController.broadcast();
 
-  final watcher = Directory.current.watch(recursive: true).listen((event) {
+  final watcher = new Watcher(Directory.current.path).events.listen((event) {
     if (!event.path.endsWith('.dart')) return;
 
     changeBroadcast.add(event);

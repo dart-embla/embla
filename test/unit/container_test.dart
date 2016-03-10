@@ -90,6 +90,11 @@ class IoCContainerTest extends UnitTest {
   }
 
   @test
+  itUsesDefaultValueIfNoBindingExists() {
+    expect(c.resolve(({s: 'default'}) => s), 'default');
+  }
+
+  @test
   itThrowsIfAMoreGeneralNamedBindingHasAlreadyBeenMade() {
     expect(
       () => c.bindName('x', to: ConcreteClass).bindName('x', to: ConcreteSubClass),
