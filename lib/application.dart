@@ -24,6 +24,9 @@ class Application {
 
   static Future _timeline(ContainerState state, Bootstrapper bootstrapper) async {
     try {
+      if (bootstrapper is! Bootstrapper) {
+        throw new ArgumentError('${bootstrapper.runtimeType} is not a Bootstrapper!');
+      }
       await bootstrapper._run(state);
       return bootstrapper;
     } catch (e, s) {

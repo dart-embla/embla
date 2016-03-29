@@ -33,15 +33,21 @@ main(List<String> arguments, SendPort sendExitCommandPort) async {
 List<Bootstrapper> _findConfig() {
   final library = currentMirrorSystem().libraries[Platform.script];
   if (library == null) {
-    throw new Exception('The script entry point is not a library');
+    throw new Exception('The script entry point is not a library. For more information, visit https://embla.io/docs');
   }
 
   final emblaMethod = library.declarations[#embla];
   if (emblaMethod == null) {
-    throw new Exception('Found no [embla] getter in ${Platform.script}');
+    throw new Exception('Found no [embla] getter in ${Platform.script}. For more information, visit https://embla.io/docs');
   }
 
-  return library
+  final bootstrappers = library
       .getField(#embla)
-      .reflectee as List<Bootstrapper>;
+      .reflectee;
+
+  if (bootstrappers is! List<Bootstrapper>) {
+    throw new Exception('The [embla] getter should return a [List<Bootstrapper>]. For more information, visit https://embla.io/docs');
+  }
+
+  return bootstrappers as List<Bootstrapper>;
 }
