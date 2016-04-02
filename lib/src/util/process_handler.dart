@@ -24,7 +24,6 @@ class ProcessHandler {
 
         var firstQuit = true;
         _sigintSub = ProcessSignal.SIGINT.watch().listen((_) {
-          print('<gray> --> Shutting down...</gray>');
           if (firstQuit) {
             firstQuit = false;
             if (stdout.hasTerminal)

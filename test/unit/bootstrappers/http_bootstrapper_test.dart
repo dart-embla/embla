@@ -8,7 +8,7 @@ export 'package:quark/init.dart';
 
 class HttpBootstrapperTest extends UnitTest {
   HttpBootstrapper bootstrapper(HttpServerDouble server, PipelineFactory pipeline) {
-    return new HttpBootstrapper.internal((host, int port) async => server, 'localhost', 1337, pipeline)..attach();
+    return new HttpBootstrapper.internal((host, int port, {bool shared}) async => server, 'localhost', 1337, pipeline)..attach();
   }
 
   dynamic silent(body()) {

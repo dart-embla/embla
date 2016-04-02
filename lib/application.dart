@@ -4,6 +4,16 @@ import 'container.dart';
 import 'src/util/trace_formatting.dart';
 import 'src/util/container_state.dart';
 
+Isolates get isolates => Zone.current[#embla.isolates]
+  ?? const Isolates(count: 1, current: 1);
+
+class Isolates {
+  final int count;
+  final int current;
+
+  const Isolates({this.count, this.current});
+}
+
 class Application {
   final IoCContainer container;
   final List<Bootstrapper> bootstrappers;
@@ -13,12 +23,12 @@ class Application {
   static Future<Application> boot(Iterable<Bootstrapper> bootstrappers) async {
     final containerState = new ContainerState(new IoCContainer());
     return new Application._(
-        containerState.state,
-        new List.unmodifiable(
-            (await Future.wait(
-                bootstrappers.map((b) => _timeline(containerState, b))
-            )).where((b) => b != null)
-        )
+      containerState.state,
+      new List.unmodifiable(
+        (await Future.wait(
+          bootstrappers.map((b) => _timeline(containerState, b))
+        )).where((b) => b != null)
+      )
     );
   }
 

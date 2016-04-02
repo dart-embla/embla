@@ -6,10 +6,15 @@ import 'dart:isolate';
 
 import 'package:watcher/watcher.dart';
 
-main(List<String> arguments) async {
+main(List<String> args) async {
+  final arguments = args.toList();
   if (arguments.length < 1) return print('Usage: embla start');
-  final command = arguments[0];
-  if (command != 'start') return print('Usage: embla start (Only the run command available currently)');
+  final command = arguments.removeAt(0);
+  if (command != 'start') return print('''Usage: embla start <options>
+
+Options:
+  [--isolates | -i] <int>    The number of instances to run (defaults to 1)
+''');
 
   final filePath = '${Directory.current.path}/bin/server.dart';
   final fileUri = new Uri.file(filePath);
@@ -32,7 +37,7 @@ main(List<String> arguments) async {
     final receiveExitCommandPort = new ReceivePort();
     await Isolate.spawnUri(
         fileUri,
-        [],
+        arguments,
         receiveExitCommandPort.sendPort,
         onExit: exitPort.sendPort,
         onError: errorPort.sendPort,

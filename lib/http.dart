@@ -17,7 +17,7 @@ export 'src/http/pipeline.dart';
 export 'src/http/middleware.dart';
 export 'src/http/routing.dart';
 
-typedef Future<HttpServer> ServerFactory(dynamic host, int port);
+typedef Future<HttpServer> ServerFactory(dynamic host, int port, {bool shared});
 
 class HttpBootstrapper extends Bootstrapper {
   final PipelineFactory pipeline;
@@ -48,8 +48,10 @@ class HttpBootstrapper extends Bootstrapper {
 
   @Hook.bindings
   bindings() async {
-    return container
-      .bind(HttpServer, to: await _serverFactory(this.host, this.port));
+    return container.bind(
+        HttpServer, 
+        to: await _serverFactory(this.host, this.port, shared: true)
+    );
   }
 
   @Hook.interaction
@@ -80,7 +82,12 @@ class HttpBootstrapper extends Bootstrapper {
           })
         );
       });
-      print('<blue>Server started on <underline>http://${server.address.host}:${server.port}</underline></blue>');
+      if (isolates.current == 1) {
+        final prefix = isolates.count == 1
+          ? 'Server'
+          : '${isolates.count} servers';
+        print('<blue>$prefix started on <underline>http://${server.address.host}:${server.port}</underline></blue>');
+      }
     });
   }
 
@@ -106,6 +113,11 @@ class HttpBootstrapper extends Bootstrapper {
   @Hook.exit
   stop(HttpServer server) async {
     await server.close();
-    print('<blue>Server stopped</blue>');
+    if (isolates.current == 1) {
+      final prefix = isolates.count == 1
+        ? 'Server'
+        : '${isolates.count} servers';
+      print('<blue>$prefix stopped</blue>');
+    }
   }
 }
