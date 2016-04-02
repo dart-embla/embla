@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+* Added an `--isolates` flag, that allows the application to be multiplexed
+  over multiple isolates. It defaults to 1.
+
+```shell
+> embla start --isolates 3
+> embla start -i 3
+> dart bin/server.dart -i 3
+```
+
 ## 0.2.2
 * Fixed a bug where routing stars didn't require a slash to follow:
 
