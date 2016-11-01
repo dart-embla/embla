@@ -111,9 +111,9 @@ pipeline: pipe(
 
     Route.put('action', () => 'Will be reached by PUT /subroutes/action'),
 
-    Route.get('another',
+    Route.post('another',
       SpecialMiddlewareForThisRoute,
-      () => 'Will be reached by PUT /subroutes/another'
+      () => 'Will be reached by POST /subroutes/another'
     ),
 
     Route.get('deeper/:wildcard',
